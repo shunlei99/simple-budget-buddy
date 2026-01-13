@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Trash2, TrendingUp, TrendingDown, Pencil } from 'lucide-react';
+import { format } from 'date-fns';
+import { Trash2, TrendingUp, TrendingDown, Pencil, CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -26,12 +27,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { Transaction, TransactionType } from '@/types/budget';
 
 interface TransactionListProps {
   transactions: Transaction[];
   onDeleteTransaction: (id: string) => void;
-  onUpdateTransaction: (id: string, updates: Omit<Transaction, 'id' | 'date'>) => void;
+  onUpdateTransaction: (id: string, updates: Omit<Transaction, 'id'>) => void;
 }
 
 const CATEGORIES = {
@@ -45,6 +53,7 @@ export function TransactionList({ transactions, onDeleteTransaction, onUpdateTra
   const [editAmount, setEditAmount] = useState('');
   const [editCategory, setEditCategory] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [editDate, setEditDate] = useState<Date>(new Date());
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -67,6 +76,7 @@ export function TransactionList({ transactions, onDeleteTransaction, onUpdateTra
     setEditAmount(transaction.amount.toString());
     setEditCategory(transaction.category);
     setEditDescription(transaction.description);
+    setEditDate(new Date(transaction.date));
   };
 
   const handleSaveEdit = () => {
@@ -77,6 +87,7 @@ export function TransactionList({ transactions, onDeleteTransaction, onUpdateTra
       amount: parseFloat(editAmount),
       category: editCategory || 'Other',
       description: editDescription,
+      date: editDate.toISOString(),
     });
 
     setEditingTransaction(null);
@@ -84,7 +95,6 @@ export function TransactionList({ transactions, onDeleteTransaction, onUpdateTra
 
   const handleTypeChange = (newType: TransactionType) => {
     setEditType(newType);
-    // Reset category when type changes
     setEditCategory('');
   };
 
@@ -254,6 +264,32 @@ export function TransactionList({ transactions, onDeleteTransaction, onUpdateTra
                   onChange={(e) => setEditDescription(e.target.value)}
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !editDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {editDate ? format(editDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={editDate}
+                    onSelect={(d) => d && setEditDate(d)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">

@@ -1,9 +1,16 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { format } from 'date-fns';
+import { Plus, CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -11,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import { TransactionType } from '@/types/budget';
 
 interface TransactionFormProps {
@@ -19,6 +27,7 @@ interface TransactionFormProps {
     amount: number;
     category: string;
     description: string;
+    date: string;
   }) => void;
 }
 
@@ -32,6 +41,7 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
+  const [date, setDate] = useState<Date>(new Date());
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,11 +52,13 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
       amount: parseFloat(amount),
       category: category || 'Other',
       description,
+      date: date.toISOString(),
     });
 
     setAmount('');
     setCategory('');
     setDescription('');
+    setDate(new Date());
   };
 
   return (
@@ -121,6 +133,32 @@ export function TransactionForm({ onAddTransaction }: TransactionFormProps) {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(d) => d && setDate(d)}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <Button type="submit" className="w-full">
