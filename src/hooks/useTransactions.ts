@@ -13,16 +13,15 @@ export function useTransactions() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
   }, [transactions]);
 
-  const addTransaction = (transaction: Omit<Transaction, 'id' | 'date'>) => {
+  const addTransaction = (transaction: Omit<Transaction, 'id'>) => {
     const newTransaction: Transaction = {
       ...transaction,
       id: crypto.randomUUID(),
-      date: new Date().toISOString(),
     };
     setTransactions((prev) => [newTransaction, ...prev]);
   };
 
-  const updateTransaction = (id: string, updates: Omit<Transaction, 'id' | 'date'>) => {
+  const updateTransaction = (id: string, updates: Omit<Transaction, 'id'>) => {
     setTransactions((prev) =>
       prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
     );
