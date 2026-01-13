@@ -1,11 +1,13 @@
 /*
-  Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:
   X-Content-Type-Options: nosniff
 
 /*.js
   Content-Type: application/javascript; charset=utf-8
 
 /*.mjs
+  Content-Type: application/javascript; charset=utf-8
+
+/*.jsx
   Content-Type: application/javascript; charset=utf-8
 
 /*.css
