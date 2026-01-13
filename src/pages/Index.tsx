@@ -9,6 +9,7 @@ const Index = () => {
   const {
     transactions,
     addTransaction,
+    updateTransaction,
     deleteTransaction,
     totalIncome,
     totalExpenses,
@@ -51,6 +52,7 @@ const Index = () => {
         <TransactionList
           transactions={transactions}
           onDeleteTransaction={deleteTransaction}
+          onUpdateTransaction={updateTransaction}
         />
       </main>
     </div>
